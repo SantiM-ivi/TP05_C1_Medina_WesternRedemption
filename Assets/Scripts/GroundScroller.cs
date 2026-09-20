@@ -3,64 +3,75 @@ using UnityEngine;
 public class GroundScroller : MonoBehaviour
 {
     [SerializeField] private Transform[] pieces;
-    [SerializeField] private bool autoDetectWidth = true;
-    [SerializeField] private float manualWidth = 20f;
 
     private float pieceWidth;
+    private float totalWidth;
 
     private void Awake()
     {
-        pieceWidth = autoDetectWidth
-            ? Camera.main.orthographicSize * 2f * Camera.main.aspect
-            : manualWidth;
+        // 1. Buscamos el ancho REAL del sprite para que encajen perfecto sin importar la cámara
+        if (pieces.Length > 0 && pieces[0].TryGetComponent<SpriteRenderer>(out var spriteRenderer))
+        {
+            pieceWidth = spriteRenderer.bounds.size.x;
+        }
+        else
+        {
+            // Salvavidas por si no hay SpriteRenderer
+            pieceWidth = 20f;
+        }
 
-        if (pieces.Length >= 2)
-            pieces[1].position = new Vector3(pieceWidth, pieces[1].position.y, pieces[1].position.z);
+        totalWidth = pieceWidth * pieces.Length;
+
+        // 2. Acomodamos las piezas en fila india de forma automática en el inicio
+        for (int i = 0; i < pieces.Length; i++)
+        {
+            pieces[i].position = new Vector3(i * pieceWidth, pieces[i].position.y, pieces[i].position.z);
+        }
     }
 
     private void Update()
     {
+        // Si el juego está pausado o el scroller detenido, no hacemos nada
+        if (!WorldScroller.Running) return;
+
+        float movement = WorldScroller.Speed * Time.deltaTime;
+
         foreach (Transform piece in pieces)
         {
-            piece.Translate(Vector3.left * WorldScroller.Speed * Time.deltaTime);
+            // Movemos la pieza hacia la izquierda
+            piece.Translate(Vector3.left * movement);
 
+            // 3. El truco del Smooth: Si la pieza pasó el límite izquierdo...
             if (piece.position.x < -pieceWidth)
-                piece.position += Vector3.right * pieceWidth * pieces.Length;
+            {
+                // En vez de sumarle un valor fijo, calculamos el exceso exacto que se pasó 
+                // de la pantalla en este frame y lo compensamos al mandarla a la derecha.
+                float overlap = piece.position.x + pieceWidth;
+                piece.position = new Vector3((totalWidth - pieceWidth) + overlap, piece.position.y, piece.position.z);
+            }
         }
     }
 }
 
 /*
- * DECISIONES DE DISEÑO
+ * DECISIONES DE DISEÑO (Para la bitácora)
  *
- * ANCHO AUTOMÁTICO DESDE LA CÁMARA
- * Con autoDetectWidth ON, el ancho se calcula como:
- *   orthographicSize * 2 * aspect
- * Esto da exactamente el ancho visible de la cámara ortográfica en
- * unidades de mundo, sin depender de un valor manual que hay que
- * mantener sincronizado con el sprite.
- *
- * DOS PIEZAS
- * Se necesitan dos GameObjects con el mismo sprite. Cuando el de la
- * izquierda sale de pantalla, se teletransporta a la derecha del otro.
- * El salto es de pieceWidth * 2 (largo total del loop), así siempre
- * hay una pieza cubriendo la pantalla visible.
- *
- * POSICIONAMIENTO AUTOMÁTICO DE pieces[1]
- * En Awake, la segunda pieza se posiciona en X = pieceWidth para que
- * no haya que hacerlo a mano en el editor. Solo hay que dejar las dos
- * piezas en X=0 y el script las acomoda.
- *
- * WRAP MODE REPEAT
- * El Wrap Mode del sprite no afecta este script porque cada pieza
- * es un GameObject separado con su propio SpriteRenderer. El Repeat
- * entra en juego si se quiere escalar el sprite más allá de 1x1 en
- * un material tiling. Para este enfoque de dos piezas no es necesario.
- *
- * SETUP EN ESCENA
- * - Crear dos GameObjects de suelo, cada uno con el sprite que cubre
- *   la pantalla completa y un BoxCollider2D en layer Ground.
- * - Dejar ambos en X=0 (Awake posiciona el segundo automáticamente).
- * - Asignarlos al array pieces en orden: primero el izquierdo, después el derecho.
- * - Dejar autoDetectWidth en true si la cámara es ortográfica estándar.
+ * ANCHO BASADO EN SPRITE (Chau gap visual)
+ * Reemplacé el cálculo de la cámara por spriteRenderer.bounds.size.x. 
+ * Medir la pantalla fallaba si el sprite no escalaba perfecto. Midiendo el 
+ * renderizador nos aseguramos de que el encastre entre piezas sea milimétrico.
+ * 
+ * BUCLE AUTOMÁTICO DINÁMICO
+ * Ahora el Awake posiciona CUALQUIER cantidad de piezas en fila (pieces.Length). 
+ * Podés usar 2, 3 o 5 piezas y el script las acomoda solas a lo ancho sin tocar nada.
+ * 
+ * CORRECCIÓN DE OVERLAP (El secreto del Smooth)
+ * Si una pieza se pasa del límite, restarle o sumarle un valor fijo rompe el loop 
+ * a los pocos segundos por la pérdida de precisión de los floats en Unity. 
+ * Calculando 'overlap' (cuánto se pasó en ese frame exacto) y sumándolo al reposicionar, 
+ * el scroll se vuelve infinitamente fluido y no se nota nunca el salto.
+ * 
+ * COMPROBACIÓN DE RUNNING
+ * Le agregué la condición de WorldScroller.Running. Si el jugador pierde y el scroller 
+ * se frena, las piezas dejan de moverse al unísono inmediatamente.
  */
