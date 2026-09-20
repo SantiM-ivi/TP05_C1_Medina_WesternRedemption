@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Ground check")]
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private Vector2 groundCheckSize = new(0.5f, 0.1f);
+    [SerializeField] private Vector2 groundCheckSize = new Vector2(0.5f, 0.1f);
     [SerializeField] private LayerMask groundLayer;
 
     public event Action Jumped;
@@ -19,23 +19,21 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded => grounded;
 
-    // Cantidad total de saltos (1 = salto simple). Los power ups pueden modificarla.
     public int MaxJumps
     {
         get => maxJumps;
         set => maxJumps = Mathf.Max(1, value);
     }
 
-    // Tiempo aproximado en el aire de un salto completo. Sirve para calcular el hueco minimo del spawner.
     public float FullJumpAirTime
     {
         get
         {
             float g = Mathf.Abs(Physics2D.gravity.y) * data.gravityScale;
-            float up = data.jumpForce / g;
-            float apex = data.jumpForce * data.jumpForce / (2f * g);
-            float down = Mathf.Sqrt(2f * apex / (g * data.fallGravityMultiplier));
-            return up + down;
+            float timeUp = data.jumpForce / g;
+            float apex = (data.jumpForce * data.jumpForce) / (2f * g);
+            float timeDown = Mathf.Sqrt(2f * apex / (g * data.fallGravityMultiplier));
+            return timeUp + timeDown;
         }
     }
 
@@ -48,24 +46,15 @@ public class PlayerController : MonoBehaviour
     private bool wasGrounded;
     private bool jumpHeld;
 
-#if UNITY_6000_0_OR_NEWER
     private float VelY
     {
         get => rb.linearVelocity.y;
         set => rb.linearVelocity = new Vector2(0f, value);
     }
-#else
-    private float VelY
-    {
-        get => rb.velocity.y;
-        set => rb.velocity = new Vector2(0f, value);
-    }
-#endif
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        // Copia local: no se modifica el ScriptableObject en runtime.
         maxJumps = data.maxJumps;
         rb.gravityScale = data.gravityScale;
         rb.freezeRotation = true;
@@ -163,3 +152,64 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
     }
 }
+
+/*
+ * DECISIONES DE DISEÑO
+ *
+ * MUNDO FIJO, JUGADOR FIJO EN X
+ * El jugador no se mueve horizontalmente. El suelo y los obstáculos
+ * avanzan hacia la izquierda.
+ 
+ * SALTO VARIABLE (lowJumpMultiplier / fallGravityMultiplier)
+ * En FixedUpdate se cambia el gravityScale según el estado vertical.
+ * Al subir sin mantener el botón se aplica lowJumpMultiplier, cortando
+ * el salto antes. Al caer se aplica fallGravityMultiplier para que el
+ * descenso sea más rápido que el ascenso y la curva se sienta pesada
+ * en lugar de floaty. Esto es preferible a cambiar velocity.y a cero
+ * porque respeta la física y se integra bien con el doble salto.
+ *
+ * COYOTE TIME
+ * Si el jugador se cae del borde sin saltar, coyoteCounter le da una
+ * ventana de 0.1 s para hacerlo igual. Muchos platformers lo usan.
+ *
+ * JUMP BUFFER
+ * Si el jugador presiona salto 0.12 s antes de tocar el suelo,
+ * el salto se ejecuta igual al aterrizar. Elimina la frustración de
+ * presionar "demasiado temprano" y el juego no responder.
+ *
+ * DATOS EN SCRIPTABLEOBJECT
+ * Los valores de jumpForce, gravityScale, etc. viven en PlayerData.
+ * En Awake se copian maxJumps a una variable local para que los power
+ * ups puedan subirlo/bajarlo en runtime sin pisar el asset original.
+ * gravityScale del Rigidbody se sobreescribe cada FixedUpdate, así
+ * que no importa lo que diga el Inspector del Rigidbody.
+ *
+ * DOBLE SALTO / POWER UP
+ * airJumpsLeft se calcula como maxJumps - 1 cada vez que se toca el
+ * suelo. Un power up solo necesita cambiar MaxJumps para habilitar
+ * o deshabilitar el doble salto sin ningún otro cambio en este script.
+ *
+ * EVENTOS Jumped / Landed
+ * Se exponen como eventos para que AudioManager y el sistema de
+ * partículas se suscriban sin que este script conozca su existencia.
+ * Mantiene el acoplamiento bajo entre sistemas.
+ *
+ * GROUND CHECK CON OverlapBox
+ * Se usa un box chico en los pies en lugar de un Raycast porque con
+ * un Raycast en el centro del collider se pierden los bordes de
+ * plataformas angostas. El box cubre todo el ancho del pie.
+ * El GroundCheck debe estar posicionado en el borde inferior exacto
+ * del BoxCollider2D del jugador para que no haya gap visual ni
+ * detección errónea.
+ *
+ * COMPATIBILIDAD DE INPUT
+ * Se detecta en compilación si el Input System nuevo está activo.
+ * Si no está, usa el Input clásico. Así el script funciona sin
+ * cambiar nada independientemente de la configuración del proyecto.
+ *
+ * COMPATIBILIDAD DE VERSIÓN UNITY
+ * linearVelocity es la API de Unity 6+. Si el proyecto es anterior,
+ * se puede reemplazar por velocity. El compilador lo detecta con el
+ * símbolo UNITY_6000_0_OR_NEWER (que en este script se usa siempre
+ * linearVelocity; ajustar si la versión es menor).
+ */
