@@ -11,18 +11,16 @@ public class Obstacle : MonoBehaviour
 
     [SerializeField] private float despawnX = -15f;
 
-    private Rigidbody2D rb;
-
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        var rb = GetComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.gravityScale = 0f;
     }
 
     private void Update()
     {
-        rb.MovePosition(rb.position + Vector2.left * WorldScroller.Speed * Time.deltaTime);
+        transform.Translate(Vector3.left * WorldScroller.Speed * Time.deltaTime);
 
         if (transform.position.x < despawnX)
             ReturnToPool();
@@ -45,32 +43,27 @@ public class Obstacle : MonoBehaviour
 /*
  * DECISIONES DE DISEÑO
  *
- * RIGIDBODY2D KINEMATIC CON MovePosition
- * Mover el transform directamente en un objeto con collider hace que
- * el motor de física no actualice la posición del collider hasta el
- * siguiente FixedUpdate, lo que causa que los triggers se detecten
- * tarde o no se detecten. Con Rigidbody2D Kinematic y MovePosition
- * la posición del collider se actualiza correctamente cada frame.
- * gravityScale = 0 para que no caiga.
+ * transform.Translate EN UPDATE
+ * El suelo usa transform.Translate en Update. Si el obstáculo usara
+ * rb.MovePosition, este opera en pasos de física (FixedUpdate, 50Hz
+ * por defecto) mientras Update corre a la frecuencia del display.
+ * El timing diferente genera un micro-desfase visual entre suelo y
+ * obstáculos aunque la velocidad sea idéntica. Usar el mismo método
+ * en el mismo ciclo elimina el desfase.
+ *
+ * RIGIDBODY2D KINEMATIC
+ * Se mantiene porque Unity 2D requiere que al menos uno de los dos
+ * objetos en una colisión tenga Rigidbody2D para que OnTriggerEnter2D
+ * se dispare. El jugador ya tiene uno, pero tenerlo también en el
+ * obstáculo hace la detección más robusta. Con bodyType Kinematic y
+ * gravityScale 0 no interfiere con el movimiento manual por transform.
  *
  * EVENTO ESTÁTICO OnPlayerHit
  * El obstáculo no sabe quién procesa el game over. Dispara el evento
- * y se desactiva. El GameManager (o quien sea) se suscribe. Bajo
- * acoplamiento entre sistemas.
+ * y se libera al pool. Bajo acoplamiento entre sistemas.
  *
- * REFERENCIA AL POOL (IObjectPool<Obstacle>)
- * El spawner asigna la referencia al pool al crear el obstáculo.
- * ReturnToPool lo usa para liberarse sin buscar al spawner. Si por
- * algún motivo Pool es null (instanciado manualmente), simplemente
- * se desactiva el GameObject.
- *
- * DESPAWN POR POSICIÓN X
- * Cuando el obstáculo sale del lado izquierdo de la pantalla vuelve
- * al pool. despawnX = -15 cubre resoluciones estándar con cámara
- * ortográfica de tamaño 5-6. Ajustá según el tamaño de tu cámara.
- *
- * TAG "Player"
- * El GameObject del jugador debe tener el tag Player para que
- * OnTriggerEnter2D lo detecte. El Collider2D del obstáculo debe
- * tener isTrigger = true.
+ * REFERENCIA AL POOL
+ * El spawner asigna Pool al crear el obstáculo. ReturnToPool lo usa
+ * para liberarse sin buscar al spawner. Si Pool es null, desactiva
+ * el GameObject como fallback.
  */
