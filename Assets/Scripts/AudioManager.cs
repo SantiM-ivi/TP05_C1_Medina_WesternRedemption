@@ -26,14 +26,6 @@ public class AudioManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         LoadVolumes();
     }
-    private void Start()
-    {
-        AudioManager.Instance.PlayGameplayMusic();
-
-        foreach (var s in FindObjectsByType<AudioSource>(FindObjectsSortMode.None))
-            if (s.isPlaying)
-                Debug.Log($"{s.name} | clip: {(s.clip ? s.clip.name : "-")} | mixer: {(s.outputAudioMixerGroup ? s.outputAudioMixerGroup.name : "NINGUNO")}", s);
-    }
 
     public void PlayMenuMusic() => PlayMusic(menuMusic);
     public void PlayGameplayMusic() => PlayMusic(gameplayMusic);
