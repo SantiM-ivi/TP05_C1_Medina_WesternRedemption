@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public event Action Landed;
 
     public bool IsGrounded => grounded;
+    public bool IsAlive => alive;
 
     public int MaxJumps
     {
@@ -45,6 +46,7 @@ public class PlayerController : MonoBehaviour
     private bool grounded;
     private bool wasGrounded;
     private bool jumpHeld;
+    private bool alive = true;
 
     private float VelY
     {
@@ -62,6 +64,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (!alive) return;
+
         if (JumpPressed()) bufferCounter = data.jumpBuffer;
         jumpHeld = JumpHeld();
         bufferCounter -= Time.deltaTime;
@@ -98,6 +102,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!alive) return;
+
         float vy = VelY;
         float mult = 1f;
 
@@ -105,6 +111,12 @@ public class PlayerController : MonoBehaviour
         else if (vy > 0f && !jumpHeld) mult = data.lowJumpMultiplier;
 
         rb.gravityScale = data.gravityScale * mult;
+    }
+
+    public void Die()
+    {
+        alive = false;
+        rb.gravityScale = data.gravityScale;
     }
 
     private void DoJump()
@@ -211,5 +223,17 @@ public class PlayerController : MonoBehaviour
  * linearVelocity es la API de Unity 6+. Si el proyecto es anterior,
  * se puede reemplazar por velocity. El compilador lo detecta con el
  * símbolo UNITY_6000_0_OR_NEWER (que en este script se usa siempre
- * linearVelocity; ajustar si la versión es menor).
+ * linearVelocity; ajustar si la versión es menor). 
+ * 
+ * FLAG alive
+ * Update y FixedUpdate retornan inmediatamente si alive es false.
+ * Esto detiene el input y la modificación de gravityScale sin
+ * deshabilitar el componente, lo que preserva los eventos de colisión
+ * y el estado del Rigidbody para una posible animación de muerte.
+ *
+ * Die() RESETEA gravityScale
+ * Al morir se vuelve a la gravityScale base del SO para que el
+ * jugador caiga normalmente si estaba en el aire al golpear un
+ * obstáculo. Sin esto quedaría flotando con el multiplicador
+ * de salto activo.
  */

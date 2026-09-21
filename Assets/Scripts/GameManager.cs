@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject pausePanel;
 
     public bool IsGameOver { get; private set; }
-    public bool IsPaused   { get; private set; }
+    public bool IsPaused { get; private set; }
 
     private float score;
 
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
-    private void OnEnable()  => Obstacle.OnPlayerHit += TriggerGameOver;
+    private void OnEnable() => Obstacle.OnPlayerHit += TriggerGameOver;
     private void OnDisable() => Obstacle.OnPlayerHit -= TriggerGameOver;
 
     private void Update()
