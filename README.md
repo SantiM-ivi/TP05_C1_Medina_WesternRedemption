@@ -73,6 +73,15 @@ Decisiones de diseño
 - **Compatibilidad de input:** el código detecta en compilación si está activo el Input System nuevo o el clásico.
 - **Volúmenes en escala lineal (0 a 1)** para los sliders, convertidos a decibelios al aplicarlos al mixer.
 
+Herramientas usadas
+- Videos de Youtube Para saber uso de las particulas y main menu.
+- https://www.youtube.com/watch?v=3Nl8UPyODgQ&t=3s&pp=ygUSdW5pdHkgMmQgcGFydGljbGVz
+- https://www.youtube.com/watch?v=1CXVbCbqKyg&pp=ygUSdW5pdHkgMmQgcGFydGljbGVz
+- https://www.youtube.com/watch?v=Wz3nbQPYwss&pp=ygUddW5pdHkgMmQgc2Nyb2xsaW5nIGJhY2tncm91bmQ%3D
+- https://www.youtube.com/watch?v=ZYZfKbLxoHI&pp=ygUddW5pdHkgMmQgc2Nyb2xsaW5nIGJhY2tncm91bmQ%3D
+- https://www.youtube.com/watch?v=RNoJGuujbjM&pp=ygUNdW5pdHkgcHJlZmFicw%3D%3D
+- IA para consultar y resolver especificamente temas del AudioManager, WorldScroller y PlayerAudioHandler.
+- Documentacion de Unity
 
 Configuración de audio
 
@@ -81,4 +90,14 @@ Configuración de audio
 - El prefab del `AudioManager` va en la escena del menú y persiste entre escenas.
 - Los eventos `On Click` de los botones no deben reproducir la música como efecto. Toda la música sale por `AudioManager.PlayMenuMusic()` y `AudioManager.PlayGameplayMusic()`.
 
+Cosas que faltan hacer
 
+Texto en el settings indicando que estas cambian en cada barra.
+Parallax background
+El item especial quedo verde, es una simple suma de score.
+Calidad de codigo
+Creo que me quedaron muchos numeros sueltos y alguna que otra dependencia, hay que revisar.
+
+Proceso del desarrollo
+
+Comenze construyendo la base del juego Dino de Google, descargue los assets originales y inicie haciendo el movimiento del player/seteando el sprite, luego el maldito scroll del background, despues las colisiones con lso prefabs de los obstaculos, que despues te llevan a la derrota, despues el audio mixer y la subida de todos los sonidos y ya con eso hice el main menu. Lo ultimo fue cambiar todo el diseño del juego a la tematica que seleccione, hice los sprites, tome referencia en read dead redemption 2 (la misma portada es en base a la del juego). Cambiando los sprites, añadiendo la particula del juegador y termine con el item de "moneda".
