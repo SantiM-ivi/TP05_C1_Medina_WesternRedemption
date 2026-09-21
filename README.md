@@ -4,14 +4,6 @@
 
 Juego 2D de tipo *endless runner* hecho en Unity. El jugador corre en su lugar mientras el mundo avanza hacia la izquierda: hay que saltar los obstáculos, juntar ítems para sumar puntaje y sobrevivir el mayor tiempo posible.
 
-**Trabajo:** TP05 – C1
-**Autor:** [Nombre] Medina ([@SantiM-ivi](https://github.com/SantiM-ivi))
-**Repositorio:** https://github.com/SantiM-ivi/TP05_C1_Medina_WesternRedemption
-**Materia / Cátedra:** [Materia]
-**Fecha de entrega:** [DD/MM/AAAA]
-**Versión de Unity:** [Ver `ProjectSettings/ProjectVersion.txt`. El proyecto usa `Rigidbody2D.linearVelocity`, disponible desde Unity 6]
-
----
 
 ## Cómo jugar
 
