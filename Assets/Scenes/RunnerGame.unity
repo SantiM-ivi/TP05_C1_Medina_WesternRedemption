@@ -357,7 +357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.3372549, g: 0.03529412, b: 0.03529412, a: 0.392}
+  m_Color: {r: 0.8207547, g: 0.63105196, b: 0.63105196, a: 0.392}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1027,7 +1027,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &884328017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1041,7 +1041,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.3372549, g: 0.03529412, b: 0.03529412, a: 0.392}
+  m_Color: {r: 0.81960785, g: 0.6313726, b: 0.6313726, a: 0.392}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1316,6 +1316,7 @@ GameObject:
   - component: {fileID: 1025274569}
   - component: {fileID: 1025274568}
   - component: {fileID: 1025274567}
+  - component: {fileID: 1025274570}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1489,6 +1490,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1025274570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025274563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cacac946493e51c45a15fcbdc3a8a8c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAudioHandler
+  jumpClip: {fileID: 8300000, guid: 3b461a0175b3c34499fa19138182a1aa, type: 3}
+  landClip: {fileID: 8300000, guid: 88910e7109112a447aa56e2663116e62, type: 3}
 --- !u!1 &1029955671
 GameObject:
   m_ObjectHideFlags: 0
@@ -2081,6 +2096,7 @@ MonoBehaviour:
   gameOverPanel: {fileID: 213455856}
   finalScoreText: {fileID: 371511333}
   pausePanel: {fileID: 884328016}
+  gameOverClip: {fileID: 8300000, guid: ff0b5dc4cc8234b4b937ae5ca0c042b7, type: 3}
 --- !u!4 &1738325191
 Transform:
   m_ObjectHideFlags: 0

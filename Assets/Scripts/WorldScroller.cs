@@ -25,6 +25,12 @@ public class WorldScroller : MonoBehaviour
         running = true;
     }
 
+    private void Update()
+    {
+        if (!running) return;
+        currentSpeed = Mathf.Min(currentSpeed + accelerationRate * Time.deltaTime, maxSpeed);
+    }
+
     public void StopScrolling() => running = false;
     public void ResetSpeed() => currentSpeed = startSpeed;
 }
@@ -32,21 +38,22 @@ public class WorldScroller : MonoBehaviour
 /*
  * DECISIONES DE DISEÑO
  *
- * SIN DEPENDENCIA DE PlayerData
- * startSpeed es un parámetro del mundo, no del jugador. Ponerlo en
- * PlayerData obligaba a WorldScroller a conocer ese ScriptableObject
- * sin una razón de diseño válida. Ahora cada sistema tiene sus propios
- * datos serializados.
- *
  * SINGLETON CON PROPIEDAD ESTÁTICA Speed
- * Los obstáculos y el suelo leen Speed sin necesitar una referencia
- * serializada. Cualquier script accede con WorldScroller.Speed.
+ * Los obstáculos y el suelo leen Speed cada frame sin necesitar
+ * una referencia serializada. Cualquier script accede con
+ * WorldScroller.Speed sin buscar el componente.
  *
- * ACELERACIÓN GRADUAL
- * La velocidad sube a ritmo constante hasta maxSpeed. La rampa hace
- * que el juego sea manejable al inicio y se vuelva difícil con el tiempo.
+ * ACELERACIÓN GRADUAL EN Update
+ * La velocidad sube a ritmo constante (accelerationRate unidades/s²)
+ * hasta maxSpeed. La rampa hace que el juego sea manejable al inicio
+ * y se vuelva difícil con el tiempo.
+ *
+ * SIN DEPENDENCIA DE PlayerData
+ * startSpeed es un parámetro del mundo, no del jugador. Cada sistema
+ * tiene sus propios datos serializados para evitar acoplamiento.
  *
  * StopScrolling / ResetSpeed
- * Game Over llama StopScrolling. ResetSpeed sirve si se reinicia sin
- * recargar la escena.
+ * GameManager llama StopScrolling en game over. ResetSpeed sirve
+ * si se reinicia sin recargar la escena.
  */
+

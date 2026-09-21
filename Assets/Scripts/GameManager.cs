@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
     [Header("UI - Pausa")]
     [SerializeField] private GameObject pausePanel;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip gameOverClip;
+
     public bool IsGameOver { get; private set; }
     public bool IsPaused { get; private set; }
 
@@ -33,15 +36,14 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
+  
     private void OnEnable() => Obstacle.OnPlayerHit += TriggerGameOver;
     private void OnDisable() => Obstacle.OnPlayerHit -= TriggerGameOver;
-
+    private void Start() => AudioManager.Instance.PlayGameplayMusic();
     private void Update()
     {
         if (IsGameOver) return;
-
         if (PausePressed()) TogglePause();
-
         if (IsPaused) return;
 
         score += Time.deltaTime * WorldScroller.Speed;
@@ -62,6 +64,9 @@ public class GameManager : MonoBehaviour
         IsGameOver = true;
 
         if (IsPaused) TogglePause();
+
+        AudioManager.Instance.StopMusic();
+        AudioManager.Instance.PlaySFX(gameOverClip);
 
         WorldScroller.Instance.StopScrolling();
         player.Die();
@@ -90,39 +95,4 @@ public class GameManager : MonoBehaviour
     }
 }
 
-/*
- * DECISIONES DE DISEÑO
- *
- * Time.timeScale = 0 PARA PAUSAR
- * Poner timeScale a 0 detiene Update, FixedUpdate y las animaciones
- * en todos los objetos de la escena sin necesidad de pausar cada
- * sistema individualmente. Al reanudar se restaura a 1. Es la forma
- * estándar de pausa en Unity.
- *
- * GUARDIA if (IsPaused) EN Update
- * Con timeScale 0 Update sigue ejecutándose (corre en tiempo real).
- * La guardia evita que el puntaje siga sumando mientras está pausado,
- * ya que Time.deltaTime con timeScale 0 devuelve 0 de todas formas,
- * pero la claridad de intención vale la línea extra.
- *
- * if (IsGameOver) ANTES DE PausePressed
- * Si el juego terminó no tiene sentido poder pausar. La guardia al
- * inicio de Update lo impide sin lógica adicional.
- *
- * TogglePause EN TriggerGameOver
- * Si el jugador muere mientras está pausado, se reanuda el timeScale
- * antes de procesar el game over. Sin esto la escena quedaría
- * congelada con el panel de game over visible pero sin poder
- * interactuar correctamente con la UI.
- *
- * Time.timeScale = 1f EN Restart
- * LoadScene no resetea timeScale. Si se reinicia desde la pausa o
- * desde game over, sin este reset la nueva escena arranca congelada.
- *
- * SETUP DE UI
- * - Crear un Panel "PausePanel" desactivado dentro del Canvas con
- *   un Text (TMP) que diga "PAUSE" y un Button "Reanudar" que llame
- *   GameManager.Instance.TogglePause().
- * - Asignar pausePanel en el Inspector de GameManager.
- * - El panel arranca desactivado en el editor igual que GameOverPanel.
- */
+
