@@ -57,6 +57,11 @@ public class GameManager : MonoBehaviour
         Time.timeScale = IsPaused ? 0f : 1f;
         if (pausePanel != null) pausePanel.SetActive(IsPaused);
     }
+    public void AddScore(float amount)
+    {
+        if (IsGameOver) return;
+        score += amount;
+    }
 
     private void TriggerGameOver()
     {
