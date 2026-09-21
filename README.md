@@ -82,16 +82,3 @@ Configuración de audio
 - Los eventos `On Click` de los botones no deben reproducir la música como efecto. Toda la música sale por `AudioManager.PlayMenuMusic()` y `AudioManager.PlayGameplayMusic()`.
 
 
-
-Créditos y recursos
-
-- **Código:** [Autor/es]
-- **Arte:** [Origen de los sprites, autor o licencia]
-- **Música:** [Título, autor, licencia]
-- **Efectos de sonido:** [Origen, autor o licencia]
-
----
-
-## Problemas conocidos / mejoras futuras
-
-- [Completar con lo que corresponda, por ejemplo: fade entre músicas, indicador de puntaje máximo, nuevos tipos de obstáculos o ítems, efectos de partículas.]
