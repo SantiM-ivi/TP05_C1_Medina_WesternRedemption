@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -14,12 +15,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Vector2 groundCheckSize = new Vector2(0.5f, 0.1f);
     [SerializeField] private LayerMask groundLayer;
 
+    [Header("Invencibilidad")]
+    [SerializeField] private float flashInterval = 0.1f;
+
     public event Action Jumped;
     public event Action Landed;
     public event Action Died;
 
     public bool IsGrounded => grounded;
     public bool IsAlive => alive;
+    public bool IsInvincible => invincible;
 
     public int MaxJumps
     {
@@ -40,6 +45,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private Rigidbody2D rb;
+    private SpriteRenderer sr;
     private int maxJumps;
     private int airJumpsLeft;
     private float coyoteCounter;
@@ -48,6 +54,7 @@ public class PlayerController : MonoBehaviour
     private bool wasGrounded;
     private bool jumpHeld;
     private bool alive = true;
+    private bool invincible;
 
     private float VelY
     {
@@ -58,6 +65,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponentInChildren<SpriteRenderer>();
         maxJumps = data.maxJumps;
         rb.gravityScale = data.gravityScale;
         rb.freezeRotation = true;
@@ -116,10 +124,31 @@ public class PlayerController : MonoBehaviour
 
     public void Die()
     {
-        Debug.Log("Die llamado");
         alive = false;
         rb.gravityScale = data.gravityScale;
         Died?.Invoke();
+    }
+
+    public void SetInvincible(float duration)
+    {
+        StopCoroutine(nameof(InvincibilityRoutine));
+        StartCoroutine(InvincibilityRoutine(duration));
+    }
+
+    private IEnumerator InvincibilityRoutine(float duration)
+    {
+        invincible = true;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            if (sr != null) sr.enabled = !sr.enabled;
+            yield return new WaitForSeconds(flashInterval);
+            elapsed += flashInterval;
+        }
+
+        if (sr != null) sr.enabled = true;
+        invincible = false;
     }
 
     private void DoJump()

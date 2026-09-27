@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2368068276601296568}
   - component: {fileID: 6050299567686320194}
   - component: {fileID: 7835625782691984347}
+  - component: {fileID: -6877458565841825346}
   m_Layer: 0
   m_Name: Item_Invencibilidad
   m_TagString: Untagged
@@ -166,3 +167,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-6877458565841825346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6414380205037398527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56ab90b7ce3f5804cac29d850b2a4857, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerUpItem
+  type: 0
+  pickupClip: {fileID: 8300000, guid: c5dc52544657edc498263836b0f6b4a8, type: 3}
+  despawnX: -15
