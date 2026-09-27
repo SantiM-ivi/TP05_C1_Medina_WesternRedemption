@@ -20,7 +20,7 @@ public class Obstacle : MonoBehaviour
 
     private void Update()
     {
-        transform.Translate(Vector3.left * WorldScroller.Speed * Time.deltaTime);
+        transform.Translate(Vector3.left * WorldScroller.Speed * Time.deltaTime, Space.World);
 
         if (transform.position.x < despawnX)
             ReturnToPool();
