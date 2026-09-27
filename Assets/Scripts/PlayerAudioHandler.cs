@@ -26,16 +26,3 @@ public class PlayerAudioHandler : MonoBehaviour
     private void OnLand() => AudioManager.Instance.PlaySFX(landClip);
 }
 
-/*
- * DECISIONES DE DISEÑO
- *
- * SCRIPT SEPARADO DE PlayerController
- * PlayerController no debería saber que existe audio. Separar la
- * responsabilidad en PlayerAudioHandler permite cambiar o sacar el
- * audio sin tocar la lógica de movimiento.
- *
- * SUSCRIPCIÓN A EVENTOS EN OnEnable / OnDisable
- * Garantiza que si el GameObject se desactiva y reactiva no quedan
- * suscripciones duplicadas. Los eventos Jumped y Landed ya están
- * definidos en PlayerController.
- */

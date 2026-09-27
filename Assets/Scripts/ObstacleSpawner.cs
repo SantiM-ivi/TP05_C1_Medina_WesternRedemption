@@ -66,36 +66,4 @@ public class ObstacleSpawner : MonoBehaviour
     }
 }
 
-/*
- * DECISIONES DE DISEÑO
- *
- * UN POOL POR PREFAB
- * Cada tipo de obstáculo tiene su propio ObjectPool. Esto permite que
- * los objetos vuelvan al pool correcto sin lógica adicional. El índice
- * idx se captura por closure porque el loop crea lambdas asíncronas.
- *
- * INTERVALO MÍNIMO BASADO EN FullJumpAirTime
- * El intervalo mínimo entre spawns es el tiempo que el jugador pasa en
- * el aire durante un salto completo más extraGap. Así se garantiza que
- * siempre hay espacio suficiente para saltar entre obstáculos y nunca
- * se genera una situación imposible de resolver.
- * Si player es null (referencia no asignada) se usa 1s como fallback.
- *
- * RANDOM ENTRE TIPOS DE PREFAB
- * Se elige un pool al azar cada spawn. Con múltiples prefabs (obstáculo
- * bajo, obstáculo alto) esto da variedad sin lógica adicional. El peso
- * de cada tipo es uniforme; si se quiere sesgar, reemplazar
- * Random.Range por un sistema de pesos.
- *
- * spawnY FIJO EN EL INSPECTOR
- * Los obstáculos aparecen siempre en la misma Y (el suelo). Si se
- * quieren obstáculos aéreos, se pueden agregar más prefabs con un
- * spawnY diferente o convertir el campo en un array de posiciones.
- *
- * SETUP EN ESCENA
- * - Crear prefabs de obstáculo con SpriteRenderer, BoxCollider2D
- *   (isTrigger ON) y el script Obstacle.
- * - Asignar los prefabs al array obstaclePrefabs.
- * - Asignar la referencia al PlayerController para el cálculo del gap.
- * - spawnX debe estar fuera del borde derecho de la cámara.
- */
+

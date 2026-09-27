@@ -1,14 +1,16 @@
-using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
+public enum PowerUpType { Invincibility, ExtraLife }
+
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class Obstacle : MonoBehaviour
+public class PowerUpItem : MonoBehaviour
 {
-    public static event Action OnPlayerHit;
-    public IObjectPool<Obstacle> Pool { get; set; }
+    public IObjectPool<PowerUpItem> Pool { get; set; }
 
+    [SerializeField] private PowerUpType type;
+    [SerializeField] private AudioClip pickupClip;
     [SerializeField] private float despawnX = -15f;
 
     private void Awake()
@@ -21,15 +23,16 @@ public class Obstacle : MonoBehaviour
     private void Update()
     {
         transform.Translate(Vector3.left * WorldScroller.Speed * Time.deltaTime);
-
-        if (transform.position.x < despawnX)
-            ReturnToPool();
+        if (transform.position.x < despawnX) ReturnToPool();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-        OnPlayerHit?.Invoke();
+        if (GameManager.Instance.IsGameOver) return;
+
+        AudioManager.Instance?.PlaySFX(pickupClip);
+        GameManager.Instance.ApplyPowerUp(type);
         ReturnToPool();
     }
 
@@ -39,4 +42,3 @@ public class Obstacle : MonoBehaviour
         else gameObject.SetActive(false);
     }
 }
-
